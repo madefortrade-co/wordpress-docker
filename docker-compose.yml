@@ -1,0 +1,48 @@
+version: "3.9"
+services:
+  wordpress-db:
+    container_name: wordpress-db
+    image: mysql:8.0.32
+    command: '--default-authentication-plugin=mysql_native_password'
+    volumes:
+      - db_data:/var/lib/mysql
+    restart: always
+    environment:
+      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/wp-db-root-pwd
+      - MYSQL_DATABASE_FILE=/run/secrets/wp-db-name
+      - MYSQL_USER_FILE=/run/secrets/wp-db-usr
+      - MYSQL_PASSWORD_FILE=/run/secrets/wp-db-pwd
+    expose:
+      - 3306
+      - 33060
+    secrets:
+      - wp-db-name
+      - wp-db-usr
+      - wp-db-pwd
+      - wp-db-root-pwd
+  wordpress:
+    container_name: wordpress-local
+    image: wordpress:latest
+    ports:
+      - 8080:80
+    restart: always
+    environment:
+      - WORDPRESS_DB_USER_FILE=/run/secrets/wp-db-usr
+      - WORDPRESS_DB_PASSWORD_FILE=/run/secrets/wp-db-pwd
+      - WORDPRESS_DB_NAME_FILE=/run/secrets/wp-db-name
+      - WORDPRESS_DB_HOST=wordpress-db
+    secrets:
+      - wp-db-usr
+      - wp-db-pwd
+      - wp-db-name
+secrets:
+  wp-db-name:
+    file: ./secrets/db-name
+  wp-db-usr:
+    file: ./secrets/db-usr
+  wp-db-pwd:
+    file: ./secrets/db-pwd
+  wp-db-root-pwd:
+    file: ./secrets/db-root-pwd
+volumes:
+  db_data:
