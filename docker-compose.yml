@@ -2,16 +2,16 @@ version: "3.9"
 services:
   wordpress-db:
     container_name: wordpress-db
-    image: mysql:8.0.32
+    image: mariadb:10.2.44
     command: '--default-authentication-plugin=mysql_native_password'
     volumes:
       - db_data:/var/lib/mysql
     restart: always
     environment:
-      - MYSQL_ROOT_PASSWORD_FILE=/run/secrets/wp-db-root-pwd
-      - MYSQL_DATABASE_FILE=/run/secrets/wp-db-name
-      - MYSQL_USER_FILE=/run/secrets/wp-db-usr
-      - MYSQL_PASSWORD_FILE=/run/secrets/wp-db-pwd
+      - MARIADB_ROOT_PASSWORD_FILE=/run/secrets/wp-db-root-pwd
+      - MARIADB_DATABASE_FILE=/run/secrets/wp-db-name
+      - MARIADB_USER_FILE=/run/secrets/wp-db-usr
+      - MARIADB_PASSWORD_FILE=/run/secrets/wp-db-pwd
     expose:
       - 3306
       - 33060
@@ -22,7 +22,7 @@ services:
       - wp-db-root-pwd
   wordpress:
     container_name: wordpress-local
-    image: wordpress:latest
+    image: wordpress:php7.4-apache
     ports:
       - 8080:80
     restart: always
